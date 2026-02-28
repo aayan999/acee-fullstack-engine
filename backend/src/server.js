@@ -28,12 +28,22 @@ const allowedOrigins = [
 app.use(
     cors({
         origin: (origin, cb) => {
-            // Allow requests with no origin (e.g. curl, Postman)
+            // 1. Allow no origin (server-to-server, curl)
             if (!origin) return cb(null, true);
-            // Allow any localhost port in development
+
+            // 2. Allow any localhost
             if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
-            if (allowedOrigins.includes(origin)) return cb(null, true);
-            cb(new Error('Not allowed by CORS'));
+
+            // 3. Normalize: strip trailing slashes
+            const normalizedOrigin = origin.replace(/\/$/, "");
+            const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ""));
+
+            // 4. Check if in list OR belongs to a vercel.app subdomain
+            if (normalizedAllowed.includes(normalizedOrigin) || normalizedOrigin.endsWith(".vercel.app")) {
+                return cb(null, true);
+            }
+
+            cb(new Error(`CORS Error: Origin ${origin} not allowed`));
         },
         credentials: true
     })
