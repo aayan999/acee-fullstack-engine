@@ -45,6 +45,11 @@ app.use(cookieParser());
 import { userRouter } from './routes/user.route.js';
 app.use("/api/v1/users", userRouter);
 
+// ── Health Check (keeps Render free tier alive) ───────────────────────────────
+app.get('/api/v1/health', (req, res) => {
+    res.json({ status: 'ok', uptime: process.uptime() });
+});
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const readJSON = (filePath, fallback) => {
