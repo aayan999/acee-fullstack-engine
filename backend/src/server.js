@@ -20,6 +20,7 @@ app.use(express.urlencoded({ extended: true, limit: '16mb' }));
 
 const allowedOrigins = [
     process.env.CORS_ORIGIN,
+    process.env.FRONTEND_URL,
     'http://localhost:5173',
     'http://localhost:5174',
 ].filter(Boolean);
@@ -95,6 +96,18 @@ app.post('/api/v1/evolve', (req, res) => {
     child.unref();
 
     res.status(202).json({ message: 'Evolution started.', repoUrl });
+});
+
+// ── Global Error Handler ──────────────────────────────────────────────────────
+// Required for asyncHandler + ApiError to return proper JSON error responses
+app.use((err, req, res, _next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    return res.status(statusCode).json({
+        success: false,
+        message,
+        errors: err.errors || [],
+    });
 });
 
 export { app };
