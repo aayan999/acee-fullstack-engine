@@ -1,0 +1,345 @@
+{
+  "timestamp": "2026-02-21T09:51:07.681Z",
+  "file": "test\\esm.js",
+  "error": "/app/test/esm.js:25\n}lt',\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T09:51:25.992Z",
+  "file": "test\\index.js",
+  "error": "/app/test/index.js:724\n} === 'jane') {\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T09:59:44.535Z",
+  "file": "test\\esm.js",
+  "error": "/app/test/esm.js:26\n}ctedKeys);\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:00:02.820Z",
+  "file": "test\\index.js",
+  "error": "/app/test/index.js:503\n}\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:04:11.333Z",
+  "file": "test\\esm.js",
+  "error": "/app/test/esm.js:26\n}pectedKeys);\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:04:30.242Z",
+  "file": "test\\index.js",
+  "error": "/app/test/index.js:503\n}\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:08:05.602Z",
+  "file": "test\\esm.js",
+  "error": "/app/test/esm.js:26\n}pectedKeys);\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:08:24.259Z",
+  "file": "test\\index.js",
+  "error": "/app/test/index.js:503\n}\n^\n\nSyntaxError: missing ) after argument list\n    at wrapSafe (node:internal/modules/cjs/loader:1464:18)\n    at checkSyntax (node:internal/main/check_syntax:78:3)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:32:18.610Z",
+  "file": "src\\controllers\\comment.controller.js",
+  "error": "/app/src/controllers/comment.controller.js:24\n};)\n^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:32:34.711Z",
+  "file": "src\\controllers\\playlist.controller.js",
+  "error": "/app/src/controllers/playlist.controller.js:43\n};)\n^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:34:18.658Z",
+  "file": "src\\controllers\\video.controller.js",
+  "error": "/app/src/controllers/video.controller.js:38\n};)\n^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:34:27.098Z",
+  "file": "src\\db\\index.js",
+  "error": "/app/src/db/index.js:5\nconst connectDB = const connectDB = async () => {\n                  ^^^^^\n\nSyntaxError: Unexpected token 'const'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:35:07.276Z",
+  "file": "src\\utils\\asyncHandler.js",
+  "error": "/app/src/utils/asyncHandler.js:3\n        Promise.resolve(requestHandler(req, res, next)).catch(module.exports = (err) => next(err);)\n                                                                                                ^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:35:15.978Z",
+  "file": "src\\utils\\cloudinary.js",
+  "error": "/app/src/utils/cloudinary.js:11\nconst uploadOnCloudinary = const uploadOnCloudinary = async (localFilePath) => {\n                           ^^^^^\n\nSyntaxError: Unexpected token 'const'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:50:17.796Z",
+  "file": "src\\db\\index.js",
+  "error": "/app/src/db/index.js:7\n        const { connection: { host } } = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);\n                                         ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:50:47.243Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "/app/src/utils/ApiError.js:2\n    function constructor(statusCode, message = \"Something went wrong\", errors = [], stack = \"\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:50:56.151Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "/app/src/utils/ApiResponse.js:2\n    function constructor(statusCode, data, message = \"Success\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:51:17.212Z",
+  "file": "src\\utils\\cloudinary.js",
+  "error": "/app/src/utils/cloudinary.js:15\n        const response = await uploader.upload(localFilePath, {\n                         ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:58:26.098Z",
+  "file": "src\\db\\index.js",
+  "error": "/app/src/db/index.js:7\n        const { connection } = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);\n                               ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:58:55.511Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "/app/src/utils/ApiError.js:2\n    function constructor(statusCode, message = \"Something went wrong\", errors = [], stack = \"\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:59:04.851Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "/app/src/utils/ApiResponse.js:2\n    function constructor(statusCode, data, message = \"Success\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T10:59:25.643Z",
+  "file": "src\\utils\\cloudinary.js",
+  "error": "/app/src/utils/cloudinary.js:15\n        const response = await uploader.upload(localFilePath, {\n                         ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:16:15.290Z",
+  "file": "src\\db\\index.js",
+  "error": "/app/src/db/index.js:7\n        const { host } = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);\n                         ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:16:44.622Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "/app/src/utils/ApiError.js:2\n    function constructor(statusCode, message = \"Something went wrong\", errors = [], stack = \"\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:16:53.157Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "/app/src/utils/ApiResponse.js:2\n    function constructor(statusCode, data, message = \"Success\") {\n             ^^^^^^^^^^^\n\nSyntaxError: Unexpected identifier 'constructor'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:17:14.686Z",
+  "file": "src\\utils\\cloudinary.js",
+  "error": "/app/src/utils/cloudinary.js:15\n        const response = await uploader.upload(localFilePath, {\n                         ^^^^^\n\nSyntaxError: Unexpected reserved word\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:27:54.246Z",
+  "file": "src\\controllers\\comment.controller.js",
+  "error": "/app/src/controllers/comment.controller.js:22\nconst deleteComment = asyncHandler(unsafe\n                                   ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:27:57.277Z",
+  "file": "src\\controllers\\dashboard.controller.js",
+  "error": "/app/src/controllers/dashboard.controller.js:13\nconst getChannelVideos = asyncHandler(unsafe\n                                      ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:27:59.590Z",
+  "file": "src\\controllers\\healthcheck.controller.js",
+  "error": "/app/src/controllers/healthcheck.controller.js:6\nconst healthcheck = asyncHandler(unsafe\n                                 ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:28:03.192Z",
+  "file": "src\\controllers\\like.controller.js",
+  "error": "/app/src/controllers/like.controller.js:24\nconst getLikedVideos = asyncHandler(unsafe\n                                    ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:28:07.962Z",
+  "file": "src\\controllers\\playlist.controller.js",
+  "error": "/app/src/controllers/playlist.controller.js:39\nconst updatePlaylist = asyncHandler(unsafe\n                                    ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:28:11.120Z",
+  "file": "src\\controllers\\subscription.controller.js",
+  "error": "/app/src/controllers/subscription.controller.js:20\nconst getSubscribedChannels = asyncHandler(unsafe\n                                           ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:28:17.043Z",
+  "file": "src\\controllers\\tweet.controller.js",
+  "error": "/app/src/controllers/tweet.controller.js:20\nconst deleteTweet = asyncHandler(unsafe\n                                 ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:28:53.517Z",
+  "file": "src\\controllers\\user.controller.js",
+  "error": "/app/src/controllers/user.controller.js:429\nconst getWatchHistory = asyncHandler(unsafe\n                                     ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:29:12.492Z",
+  "file": "src\\controllers\\video.controller.js",
+  "error": "/app/src/controllers/video.controller.js:36\nconst togglePublishStatus = asyncHandler(unsafe\n                                         ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:29:27.085Z",
+  "file": "src\\index.js",
+  "error": "/app/src/index.js:17\n.catch(unsafe\n       ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:29:33.473Z",
+  "file": "src\\middlewares\\auth.middleware.js",
+  "error": "/app/src/middlewares/auth.middleware.js:6\nexport const verifyJWT = asyncHandler(unsafe\n                                      ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:13.256Z",
+  "file": "src\\controllers\\comment.controller.js",
+  "error": "/app/src/controllers/comment.controller.js:22\nconst deleteComment = asyncHandler(unsafe\n                                   ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:15.837Z",
+  "file": "src\\controllers\\dashboard.controller.js",
+  "error": "/app/src/controllers/dashboard.controller.js:13\nconst getChannelVideos = asyncHandler(unsafe\n                                      ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:17.991Z",
+  "file": "src\\controllers\\healthcheck.controller.js",
+  "error": "/app/src/controllers/healthcheck.controller.js:6\nconst healthcheck = asyncHandler(unsafe\n                                 ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:21.415Z",
+  "file": "src\\controllers\\like.controller.js",
+  "error": "/app/src/controllers/like.controller.js:24\nconst getLikedVideos = asyncHandler(unsafe\n                                    ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:25.988Z",
+  "file": "src\\controllers\\playlist.controller.js",
+  "error": "/app/src/controllers/playlist.controller.js:39\nconst updatePlaylist = asyncHandler(unsafe\n                                    ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:28.897Z",
+  "file": "src\\controllers\\subscription.controller.js",
+  "error": "/app/src/controllers/subscription.controller.js:20\nconst getSubscribedChannels = asyncHandler(unsafe\n                                           ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:34:34.484Z",
+  "file": "src\\controllers\\tweet.controller.js",
+  "error": "/app/src/controllers/tweet.controller.js:20\nconst deleteTweet = asyncHandler(unsafe\n                                 ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:35:10.952Z",
+  "file": "src\\controllers\\user.controller.js",
+  "error": "/app/src/controllers/user.controller.js:429\nconst getWatchHistory = asyncHandler(unsafe\n                                     ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:35:28.698Z",
+  "file": "src\\controllers\\video.controller.js",
+  "error": "/app/src/controllers/video.controller.js:36\nconst togglePublishStatus = asyncHandler(unsafe\n                                         ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:35:43.450Z",
+  "file": "src\\index.js",
+  "error": "/app/src/index.js:17\n.catch(unsafe\n       ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:35:50.112Z",
+  "file": "src\\middlewares\\auth.middleware.js",
+  "error": "/app/src/middlewares/auth.middleware.js:6\nexport const verifyJWT = asyncHandler(unsafe\n                                      ^^^^^^\n\nSyntaxError: missing ) after argument list\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:45:19.811Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "/app/src/utils/ApiError.js:3\n    super(message)\n    ^^^^^\n\nSyntaxError: 'super' keyword unexpected here\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:45:28.415Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "/app/src/utils/ApiResponse.js:2\n    async (statusCode, data, message = \"Success\") => {\n                                                  ^^\n\nSyntaxError: Unexpected token '=>'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:55:25.887Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "/app/src/utils/ApiError.js:2\n    async (statusCode, message = \"Something went wrong\", errors = [], stack = \"\") => {\n                                                                                  ^^\n\nSyntaxError: Unexpected token '=>'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-21T11:55:34.916Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "/app/src/utils/ApiResponse.js:2\n    async (statusCode, data, message = \"Success\") => {\n                                                  ^^\n\nSyntaxError: Unexpected token '=>'\n    at checkSyntax (node:internal/main/check_syntax:74:5)\n\nNode.js v20.20.0\n"
+},
+{
+  "timestamp": "2026-02-27T17:37:40.262Z",
+  "file": "src\\controllers\\comment.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:37:50.093Z",
+  "file": "src\\controllers\\dashboard.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:37:55.288Z",
+  "file": "src\\controllers\\healthcheck.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:38:09.689Z",
+  "file": "src\\controllers\\like.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:38:41.800Z",
+  "file": "src\\controllers\\playlist.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:38:55.517Z",
+  "file": "src\\controllers\\subscription.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:38:56.289Z",
+  "file": "src\\controllers\\tweet.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:39:52.888Z",
+  "file": "src\\controllers\\user.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:19.801Z",
+  "file": "src\\controllers\\video.controller.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:24.984Z",
+  "file": "src\\db\\index.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:39.723Z",
+  "file": "src\\index.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:45.523Z",
+  "file": "src\\middlewares\\auth.middleware.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:51.019Z",
+  "file": "src\\utils\\ApiError.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:40:56.316Z",
+  "file": "src\\utils\\ApiResponse.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:41:06.210Z",
+  "file": "src\\utils\\asyncHandler.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T17:41:11.669Z",
+  "file": "src\\utils\\cloudinary.js",
+  "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+},
+{
+  "timestamp": "2026-02-27T19:30:58.322Z",
+  "file": "src\\utils\\asyncHandler.js",
+  "error": "Syntax/Validation Error"
+},

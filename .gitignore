@@ -1,0 +1,32 @@
+# acee-engine/workspace/node_modules
+node_modules/
+
+# acee-engine/workspace/.env
+.env
+
+# acee-engine/workspace/coverage
+coverage/
+
+# acee-engine/workspace/cache
+.cache/
+
+# acee-engine/workspace/build
+build/
+dist/
+
+# acee-engine/workspace/logs
+logs/
+
+# acee-engine/workspace/temp
+temp/
+tmp/
+
+# acee-engine/workspace/backup
+*.bak
+*.backup
+
+# acee-engine/workspace/test-results
+test-results/
+
+# acee-engine/workspace/reports
+reports/
