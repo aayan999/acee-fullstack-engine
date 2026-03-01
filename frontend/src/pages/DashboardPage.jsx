@@ -71,24 +71,18 @@ function StatCard({ stat, value, index, maxValue }) {
 
 /* ─── Status banner ───────────────────────────────────── */
 function StatusBanner({ status, repoUrl, isRunning }) {
-    if (status === 'idle') return null;
-
-    const cfg = {
-        running: { icon: '⚙️', bg: 'rgba(251,191,36,0.06)', border: 'rgba(251,191,36,0.15)', color: 'var(--amber)', label: 'Evolution in progress…' },
-        done: { icon: '✅', bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.15)', color: 'var(--green)', label: 'Last run completed successfully' },
-        error: { icon: '❌', bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.15)', color: 'var(--red)', label: 'Last run failed' },
-    }[status];
-    if (!cfg) return null;
+    // Only show banner while a run is actively in progress
+    if (status !== 'running') return null;
 
     return (
         <div style={{
             display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px',
-            borderRadius: 'var(--r-md)', background: cfg.bg, border: `1px solid ${cfg.border}`,
+            borderRadius: 'var(--r-md)', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)',
             animation: 'fadeIn 0.3s var(--ease) both', marginBottom: 24,
         }}>
-            <span style={{ fontSize: '1.1rem' }}>{cfg.icon}</span>
+            <span style={{ fontSize: '1.1rem' }}>⚙️</span>
             <div style={{ flex: 1 }}>
-                <span style={{ color: cfg.color, fontWeight: 600, fontSize: '0.88rem' }}>{cfg.label}</span>
+                <span style={{ color: 'var(--amber)', fontWeight: 600, fontSize: '0.88rem' }}>Evolution in progress…</span>
                 {repoUrl && <span style={{ color: 'var(--text-3)', fontSize: '0.82rem', marginLeft: 8 }}>— {repoUrl.length > 50 ? '…' + repoUrl.slice(-40) : repoUrl}</span>}
             </div>
             {isRunning && <div className="progress-bar" style={{ width: 120 }} />}
@@ -164,7 +158,9 @@ export default function DashboardPage() {
         try {
             const { data } = await api.getStatus();
             setRunStatus(data);
-            if (data.status === 'done' || data.status === 'error') {
+            // Status endpoint now returns 'running' or 'idle' only
+            // When no longer running, stop polling and refresh stats
+            if (data.status !== 'running') {
                 clearInterval(pollRef.current); pollRef.current = null;
                 fetchStats();
             }
@@ -290,13 +286,7 @@ export default function DashboardPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                         <div>
                             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 4 }}>Audit Statistics</h2>
-                            {stats.repoUrl && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>
-                                    <a href={stats.repoUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--purple-3)', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 500 }}>{stats.repoUrl}</a>
-                                    {stats.completionTime && <span style={{ color: 'var(--text-4)', fontSize: '0.75rem' }}>· {stats.completionTime}</span>}
-                                </div>
-                            )}
+                            <p style={{ color: 'var(--text-3)', fontSize: '0.8rem', margin: 0 }}>Your personal evolution metrics</p>
                         </div>
                         <button className="btn btn-ghost" onClick={fetchStats} id="refresh-btn" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
                             ↻ Refresh

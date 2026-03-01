@@ -1,17 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
+import { Run } from './models/run.model.js';
+import { verifyJWT } from './middlewares/auth.middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const ENGINE_DIR = path.resolve(__dirname, '../../acee-engine');
-const STATS_FILE = path.join(ENGINE_DIR, 'dashboard_data.json');
-const STATUS_FILE = path.join(ENGINE_DIR, 'run_status.json');
+
+// Maximum time (ms) a run can stay "running" before we mark it as timed-out
+const RUN_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const app = express();
 
@@ -28,21 +30,15 @@ const allowedOrigins = [
 app.use(
     cors({
         origin: (origin, cb) => {
-            // 1. Allow no origin (server-to-server, curl)
             if (!origin) return cb(null, true);
-
-            // 2. Allow any localhost
             if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
 
-            // 3. Normalize: strip trailing slashes
             const normalizedOrigin = origin.replace(/\/$/, "");
             const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ""));
 
-            // 4. Check if in list OR belongs to a vercel.app subdomain
             if (normalizedAllowed.includes(normalizedOrigin) || normalizedOrigin.endsWith(".vercel.app")) {
                 return cb(null, true);
             }
-
             cb(new Error(`CORS Error: Origin ${origin} not allowed`));
         },
         credentials: true
@@ -55,66 +51,136 @@ app.use(cookieParser());
 import { userRouter } from './routes/user.route.js';
 app.use("/api/v1/users", userRouter);
 
-// ── Health Check (keeps Render free tier alive) ───────────────────────────────
+// ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/api/v1/health', (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helper: auto-timeout stale runs ───────────────────────────────────────────
+async function timeoutStaleRun(userId) {
+    const stale = await Run.findOne({ user: userId, status: 'running' });
+    if (stale && Date.now() - new Date(stale.startedAt).getTime() > RUN_TIMEOUT_MS) {
+        stale.status = 'error';
+        stale.errorMessage = 'Run timed out (exceeded 10 minutes).';
+        stale.finishedAt = new Date();
+        await stale.save();
+        return true;
+    }
+    return false;
+}
 
-const readJSON = (filePath, fallback) => {
+// ── GET /api/v1/dashboard  (per-user stats from last completed run) ──────────
+app.get('/api/v1/dashboard', verifyJWT, async (req, res) => {
     try {
-        if (fs.existsSync(filePath)) return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    } catch (_) { }
-    return fallback;
-};
+        // Auto-timeout any stale running job for this user
+        await timeoutStaleRun(req.user._id);
 
-// ── GET /api/v1/dashboard ─────────────────────────────────────────────────────
-app.get('/api/v1/dashboard', (req, res) => {
-    const data = readJSON(STATS_FILE, {
-        totalScanned: 0,
-        successfulFixes: 0,
-        syntaxErrorsPrevented: 0,
-        totalCharsSaved: 0,
-        completionTime: null,
-        repoUrl: null,
-    });
-    res.json({ data });
+        const lastRun = await Run.findOne(
+            { user: req.user._id, status: { $in: ['done', 'error'] } }
+        ).sort({ finishedAt: -1 });
+
+        if (!lastRun) {
+            return res.json({
+                data: {
+                    totalScanned: 0,
+                    successfulFixes: 0,
+                    syntaxErrorsPrevented: 0,
+                    totalCharsSaved: 0,
+                    completionTime: null,
+                    repoUrl: null,
+                }
+            });
+        }
+
+        const s = lastRun.stats;
+        return res.json({
+            data: {
+                totalScanned: s.totalScanned,
+                successfulFixes: s.successfulFixes,
+                syntaxErrorsPrevented: s.syntaxErrorsPrevented,
+                totalCharsSaved: s.totalCharsSaved,
+                completionTime: lastRun.finishedAt ? lastRun.finishedAt.toLocaleString() : null,
+                repoUrl: lastRun.repoUrl,
+            }
+        });
+    } catch (err) {
+        console.error('[dashboard] Error:', err.message);
+        res.status(500).json({ message: 'Failed to load dashboard data.' });
+    }
 });
 
-// ── GET /api/v1/status ────────────────────────────────────────────────────────
-app.get('/api/v1/status', (req, res) => {
-    const data = readJSON(STATUS_FILE, { status: 'idle', repoUrl: null });
-    res.json({ data });
+// ── GET /api/v1/status  (per-user current run status) ────────────────────────
+app.get('/api/v1/status', verifyJWT, async (req, res) => {
+    try {
+        // Auto-timeout stale runs
+        await timeoutStaleRun(req.user._id);
+
+        const activeRun = await Run.findOne(
+            { user: req.user._id, status: 'running' }
+        );
+
+        if (activeRun) {
+            return res.json({ data: { status: 'running', repoUrl: activeRun.repoUrl } });
+        }
+
+        // No active run — return idle
+        return res.json({ data: { status: 'idle', repoUrl: null } });
+    } catch (err) {
+        console.error('[status] Error:', err.message);
+        res.status(500).json({ message: 'Failed to fetch status.' });
+    }
 });
 
-// ── POST /api/v1/evolve ───────────────────────────────────────────────────────
-app.post('/api/v1/evolve', (req, res) => {
+// ── POST /api/v1/evolve  (start per-user evolution) ──────────────────────────
+app.post('/api/v1/evolve', verifyJWT, async (req, res) => {
     const { repoUrl } = req.body;
 
     if (!repoUrl || !repoUrl.startsWith('https://github.com/')) {
         return res.status(400).json({ message: 'A valid GitHub repo URL is required.' });
     }
 
-    // Reject if already running
-    const current = readJSON(STATUS_FILE, { status: 'idle' });
-    if (current.status === 'running') {
-        return res.status(409).json({ message: 'An evolution run is already in progress.' });
+    try {
+        // Auto-timeout stale runs
+        await timeoutStaleRun(req.user._id);
+
+        // Reject if user already has a running job
+        const existing = await Run.findOne({ user: req.user._id, status: 'running' });
+        if (existing) {
+            return res.status(409).json({ message: 'An evolution run is already in progress.' });
+        }
+
+        // Create a new run document
+        const run = await Run.create({
+            user: req.user._id,
+            repoUrl,
+            status: 'running',
+            startedAt: new Date(),
+        });
+
+        // Forward all relevant env vars to the child engine process
+        const childEnv = {
+            ...process.env,
+            ACEE_RUN_ID: run._id.toString(),
+            ACEE_MONGODB_URI: process.env.MONGODB_URI,
+        };
+
+        // Spawn engine as background process
+        const child = spawn('node', ['main.js', repoUrl], {
+            cwd: ENGINE_DIR,
+            detached: true,
+            stdio: 'ignore',
+            env: childEnv,
+        });
+        child.unref();
+
+        res.status(202).json({ message: 'Evolution started.', repoUrl, runId: run._id });
+    } catch (err) {
+        console.error('[evolve] Error:', err.message);
+        res.status(500).json({ message: 'Failed to start evolution run.' });
     }
-
-    // Spawn engine as background process — detached so it outlives this request
-    const child = spawn('node', ['main.js', repoUrl], {
-        cwd: ENGINE_DIR,
-        detached: true,
-        stdio: 'ignore',
-    });
-    child.unref();
-
-    res.status(202).json({ message: 'Evolution started.', repoUrl });
 });
 
 // ── Global Error Handler ──────────────────────────────────────────────────────
-// Required for asyncHandler + ApiError to return proper JSON error responses
 app.use((err, req, res, _next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';

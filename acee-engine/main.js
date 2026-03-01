@@ -17,8 +17,46 @@ const DASHBOARD_FILE = path.join(__dirname, 'dashboard_data.json');
 const FILE_CONCURRENCY = parseInt(process.env.ACEE_FILE_CONCURRENCY, 10) || 3;
 
 const writeStatus = (status, repoUrl, extra = {}) => {
-    fs.writeFileSync(STATUS_FILE, JSON.stringify({ status, repoUrl, ...extra }, null, 2));
+    try {
+        fs.writeFileSync(STATUS_FILE, JSON.stringify({ status, repoUrl, ...extra }, null, 2));
+    } catch (e) {
+        console.error('Could not write status file:', e.message);
+    }
 };
+
+// ── MongoDB reporting (when launched from backend) ────────────────────────────
+async function updateRunInDB(runId, update) {
+    if (!runId) return; // Not launched from backend, skip DB update
+    try {
+        const mongoUri = process.env.ACEE_MONGODB_URI || process.env.MONGODB_URI;
+        if (!mongoUri) {
+            console.log('⚠️ No MongoDB URI available, skipping DB update.');
+            return;
+        }
+        const mongoose = await import('mongoose');
+        if (mongoose.default.connection.readyState === 0) {
+            await mongoose.default.connect(mongoUri);
+        }
+        // Direct collection update — avoids needing to import the model
+        await mongoose.default.connection.db
+            .collection('runs')
+            .updateOne(
+                { _id: new mongoose.default.Types.ObjectId(runId) },
+                { $set: update }
+            );
+    } catch (e) {
+        console.error('⚠️ DB update error:', e.message);
+    }
+}
+
+async function disconnectDB() {
+    try {
+        const mongoose = await import('mongoose');
+        if (mongoose.default.connection.readyState !== 0) {
+            await mongoose.default.disconnect();
+        }
+    } catch (_) { /* ignore */ }
+}
 
 const projectAudit = {
     totalScanned: 0,
@@ -73,9 +111,6 @@ async function processFile(targetFile, ingestor, analyzer, evolver, validator) {
         console.log(`🔧 Evolving: ${displayName} (score: ${score}) — ${reasons.join(', ')}`);
         try {
             const upgradedCode = await evolver.evolveFunction(func.functionName, func.functionBody);
-
-            // ⚡ REMOVED fixed 4s sleep — the evolver's concurrency limiter and
-            // reactive backoff handle rate-limiting dynamically.
 
             if (upgradedCode && upgradedCode.trim() && upgradedCode !== func.functionBody) {
                 // 🛡️ Bracket Guard: Ensure AI didn't lose punctuation
@@ -164,6 +199,7 @@ async function processFile(targetFile, ingestor, analyzer, evolver, validator) {
 
 async function startEvolution() {
     const startTimestamp = Date.now();
+    const runId = process.env.ACEE_RUN_ID || null;
 
     // Read repo URL from CLI argument
     const repoUrl = process.argv[2];
@@ -178,12 +214,21 @@ async function startEvolution() {
         // 1. Ingest: Clone and prepare workspace
         const ingestor = new Ingestor("./workspace");
         ingestor.prepareWorkSpace();
-        await ingestor.cloneRepo(repoUrl);
+        const cloneSuccess = await ingestor.cloneRepo(repoUrl);
+        if (!cloneSuccess) {
+            throw new Error(`Failed to clone repository: ${repoUrl}`);
+        }
 
         // ⚡ Use async file discovery (non-blocking I/O)
         const availableFiles = await ingestor.getFilesByLanguageAsync('javascript');
         if (availableFiles.length === 0) {
             console.log("⚠️ No JS files found.");
+            // Update DB with "done" even if no files found
+            await updateRunInDB(runId, {
+                status: 'done',
+                finishedAt: new Date(),
+                'stats.totalScanned': 0,
+            });
             return;
         }
 
@@ -240,10 +285,27 @@ async function startEvolution() {
             concurrency: FILE_CONCURRENCY,
             completionTime: new Date().toLocaleString()
         };
-        fs.writeFileSync(DASHBOARD_FILE, JSON.stringify(finalStats, null, 2));
+
+        // Write local JSON files (for standalone/dev usage)
+        try {
+            fs.writeFileSync(DASHBOARD_FILE, JSON.stringify(finalStats, null, 2));
+        } catch (_) { /* may fail on ephemeral FS */ }
+
         writeStatus('done', repoUrl, {
-            startedAt: JSON.parse(fs.readFileSync(STATUS_FILE, 'utf8')).startedAt,
+            startedAt: new Date(startTimestamp).toISOString(),
             finishedAt: new Date().toISOString()
+        });
+
+        // ✅ Update MongoDB (per-user run record)
+        await updateRunInDB(runId, {
+            status: 'done',
+            finishedAt: new Date(),
+            stats: {
+                totalScanned: projectAudit.totalScanned,
+                successfulFixes: projectAudit.successfulFixes,
+                syntaxErrorsPrevented: projectAudit.syntaxErrorsPrevented,
+                totalCharsSaved: projectAudit.totalCharsSaved,
+            },
         });
 
     } catch (error) {
@@ -252,6 +314,15 @@ async function startEvolution() {
             finishedAt: new Date().toISOString(),
             errorMessage: error.message
         });
+
+        // ❌ Update MongoDB with error status
+        await updateRunInDB(runId, {
+            status: 'error',
+            finishedAt: new Date(),
+            errorMessage: error.message,
+        });
+    } finally {
+        await disconnectDB();
     }
 }
 

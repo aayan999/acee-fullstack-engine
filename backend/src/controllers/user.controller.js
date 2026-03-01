@@ -91,10 +91,11 @@ const loginUser = asyncHandler(
 
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
+        const isProd = process.env.NODE_ENV === 'production';
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
         };
 
         return res
@@ -126,10 +127,11 @@ const logoutUser = asyncHandler(
             }
         );
 
+        const isProd = process.env.NODE_ENV === 'production';
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
         };
 
         return res
@@ -169,10 +171,11 @@ const refreshAccessToken = asyncHandler(
                 throw new ApiError(400, "Invalid refresh token");
             }
 
+            const isProd = process.env.NODE_ENV === 'production';
             const options = {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                secure: isProd,
+                sameSite: isProd ? 'none' : 'lax',
             }
 
             const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
