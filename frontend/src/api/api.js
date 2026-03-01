@@ -1,9 +1,17 @@
 const BASE_URL = `${import.meta.env.VITE_API_URL || ''}/api/v1`;
 
 async function request(path, options = {}) {
+    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    try {
+        const token = sessionStorage.getItem('acee_token');
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+    } catch (_) { }
+
     const res = await fetch(`${BASE_URL}${path}`, {
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json', ...options.headers },
+        headers,
         ...options,
     });
 

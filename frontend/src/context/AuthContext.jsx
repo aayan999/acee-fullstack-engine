@@ -18,6 +18,9 @@ export function AuthProvider({ children }) {
         const userData = data.data?.user ?? data.data ?? null;
         setUser(userData);
         sessionStorage.setItem('acee_user', JSON.stringify(userData));
+        if (data.data?.accessToken) {
+            sessionStorage.setItem('acee_token', data.data.accessToken);
+        }
         return data;
     }, []);
 
@@ -29,6 +32,7 @@ export function AuthProvider({ children }) {
         try { await api.logout(); } catch (_) { /* ignore */ }
         setUser(null);
         sessionStorage.removeItem('acee_user');
+        sessionStorage.removeItem('acee_token');
     }, []);
 
     return (
