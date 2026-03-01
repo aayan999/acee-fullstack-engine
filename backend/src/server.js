@@ -41,7 +41,9 @@ app.use(
             }
             cb(new Error(`CORS Error: Origin ${origin} not allowed`));
         },
-        credentials: true
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     })
 );
 
