@@ -21,6 +21,9 @@ export function AuthProvider({ children }) {
         if (data.data?.accessToken) {
             sessionStorage.setItem('acee_token', data.data.accessToken);
         }
+        if (data.data?.refreshToken) {
+            sessionStorage.setItem('acee_refresh_token', data.data.refreshToken);
+        }
         return data;
     }, []);
 
@@ -33,6 +36,7 @@ export function AuthProvider({ children }) {
         setUser(null);
         sessionStorage.removeItem('acee_user');
         sessionStorage.removeItem('acee_token');
+        sessionStorage.removeItem('acee_refresh_token');
     }, []);
 
     return (
