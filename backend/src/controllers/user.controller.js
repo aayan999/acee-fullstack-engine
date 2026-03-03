@@ -123,7 +123,7 @@ const logoutUser = asyncHandler(
                 }
             },
             {
-                new: true
+                returnDocument: 'after'
             }
         );
 
