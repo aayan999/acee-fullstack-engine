@@ -208,11 +208,19 @@ async function startEvolution() {
         process.exit(1);
     }
 
+    // Generate a unique workspace subfolder per run
+    // e.g. ./workspace/react-codemirror_abc12345
+    const repoName = repoUrl.replace(/\.git$/, '').split('/').pop() || 'repo';
+    const runSuffix = runId ? `_${runId.slice(-8)}` : `_${Date.now()}`;
+    const runWorkspace = path.join('./workspace', `${repoName}${runSuffix}`);
+
+    console.log(`📁 Workspace for this run: ${runWorkspace}`);
+
     writeStatus('running', repoUrl, { startedAt: new Date().toISOString() });
 
     try {
         // 1. Ingest: Clone and prepare workspace
-        const ingestor = new Ingestor("./workspace");
+        const ingestor = new Ingestor(runWorkspace);
         ingestor.prepareWorkSpace();
         const cloneSuccess = await ingestor.cloneRepo(repoUrl);
         if (!cloneSuccess) {
@@ -234,7 +242,7 @@ async function startEvolution() {
 
         const analyzer = new Analyzer();
         const evolver = new CodeEvolver();
-        const validator = new Validator("./workspace");
+        const validator = new Validator(runWorkspace);
 
         console.log(`🚀 ACEE: Starting Mass Evolution on ${availableFiles.length} files (concurrency: ${FILE_CONCURRENCY})...`);
 
@@ -322,6 +330,15 @@ async function startEvolution() {
             errorMessage: error.message,
         });
     } finally {
+        // Clean up the run-specific workspace folder
+        try {
+            if (fs.existsSync(runWorkspace)) {
+                fs.rmSync(runWorkspace, { recursive: true, force: true });
+                console.log(`🧹 Cleaned up workspace: ${runWorkspace}`);
+            }
+        } catch (e) {
+            console.warn(`⚠️ Could not clean workspace: ${e.message}`);
+        }
         await disconnectDB();
     }
 }
