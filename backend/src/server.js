@@ -73,6 +73,7 @@ async function timeoutStaleRun(userId) {
 
 // ── GET /api/v1/dashboard  (per-user stats from last completed run) ──────────
 app.get('/api/v1/dashboard', verifyJWT, async (req, res) => {
+    console.log(`[dashboard] Request from user: ${req.user?._id}`);
     try {
         // Auto-timeout any stale running job for this user
         await timeoutStaleRun(req.user._id);
@@ -136,20 +137,26 @@ app.get('/api/v1/status', verifyJWT, async (req, res) => {
 // ── POST /api/v1/evolve  (start per-user evolution) ──────────────────────────
 app.post('/api/v1/evolve', verifyJWT, async (req, res) => {
     const { repoUrl } = req.body;
+    console.log(`[evolve] Evolution request received: ${repoUrl} (User: ${req.user?._id})`);
 
     if (!repoUrl || !repoUrl.startsWith('https://github.com/')) {
+        console.warn(`[evolve] Rejected: Invalid GitHub URL: ${repoUrl}`);
         return res.status(400).json({ message: 'A valid GitHub repo URL is required.' });
     }
 
     try {
+        console.log(`[evolve] Checking for stale/active runs...`);
         // Auto-timeout stale runs
         await timeoutStaleRun(req.user._id);
 
         // Reject if user already has a running job
         const existing = await Run.findOne({ user: req.user._id, status: 'running' });
         if (existing) {
+            console.warn(`[evolve] Rejected: Run already in progress for user ${req.user._id}`);
             return res.status(409).json({ message: 'An evolution run is already in progress.' });
         }
+
+        console.log(`[evolve] Starting new run...`);
 
         // Create a new run document
         const run = await Run.create({
