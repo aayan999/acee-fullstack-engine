@@ -197,9 +197,28 @@ app.post('/api/v1/evolve', verifyJWT, async (req, res) => {
         const child = spawn('node', ['main.js', repoUrl], {
             cwd: ENGINE_DIR,
             detached: true,
-            stdio: 'ignore',
+            stdio: ['ignore', 'pipe', 'pipe'],
             env: childEnv,
         });
+
+        // Forward engine output to server logs
+        child.stdout.on('data', (data) => {
+            String(data).split('\n').filter(Boolean).forEach(line =>
+                console.log(`[engine] ${line}`)
+            );
+        });
+        child.stderr.on('data', (data) => {
+            String(data).split('\n').filter(Boolean).forEach(line =>
+                console.error(`[engine:err] ${line}`)
+            );
+        });
+        child.on('error', (err) => {
+            console.error(`[engine] Failed to start: ${err.message}`);
+        });
+        child.on('exit', (code) => {
+            console.log(`[engine] Process exited with code ${code}`);
+        });
+
         child.unref();
 
         res.status(202).json({ message: 'Evolution started.', repoUrl, runId: run._id });
