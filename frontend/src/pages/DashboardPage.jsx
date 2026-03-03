@@ -70,7 +70,7 @@ function StatCard({ stat, value, index, maxValue }) {
 }
 
 /* ─── Status banner ───────────────────────────────────── */
-function StatusBanner({ status, repoUrl, isRunning }) {
+function StatusBanner({ status, repoUrl, isRunning, onForceReset }) {
     // Only show banner while a run is actively in progress
     if (status !== 'running') return null;
 
@@ -86,6 +86,11 @@ function StatusBanner({ status, repoUrl, isRunning }) {
                 {repoUrl && <span style={{ color: 'var(--text-3)', fontSize: '0.82rem', marginLeft: 8 }}>— {repoUrl.length > 50 ? '…' + repoUrl.slice(-40) : repoUrl}</span>}
             </div>
             {isRunning && <div className="progress-bar" style={{ width: 120 }} />}
+            {onForceReset && (
+                <button className="btn btn-ghost" onClick={onForceReset} style={{ fontSize: '0.78rem', padding: '5px 12px', color: '#f87171', borderColor: 'rgba(248,113,113,0.3)' }}>
+                    ⛔ Force Stop
+                </button>
+            )}
         </div>
     );
 }
@@ -191,6 +196,16 @@ export default function DashboardPage() {
         navigate('/login');
     };
 
+    const handleForceReset = async () => {
+        try {
+            await api.resetRun();
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            setRunStatus({ status: 'idle', repoUrl: null });
+            fetchStats();
+        } catch (err) { setRunError(err.message); }
+    };
+
     const isRunning = runStatus.status === 'running';
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -243,7 +258,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* ─── Status banner ───────────────────────────── */}
-                <StatusBanner status={runStatus.status} repoUrl={runStatus.repoUrl} isRunning={isRunning} />
+                <StatusBanner status={runStatus.status} repoUrl={runStatus.repoUrl} isRunning={isRunning} onForceReset={handleForceReset} />
 
                 {/* ─── Quick actions ───────────────────────────── */}
                 <QuickActions onRefresh={fetchStats} />

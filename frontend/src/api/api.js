@@ -76,4 +76,5 @@ export const api = {
     dashboard: () => request('/dashboard', { method: 'GET' }),
     getStatus: () => request('/status', { method: 'GET' }),
     evolve: (repoUrl) => request('/evolve', { method: 'POST', body: JSON.stringify({ repoUrl }) }),
+    resetRun: () => request('/reset-run', { method: 'POST' }),
 };

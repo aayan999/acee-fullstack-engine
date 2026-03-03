@@ -61,15 +61,35 @@ app.get('/api/v1/health', (req, res) => {
 // ── Helper: auto-timeout stale runs ───────────────────────────────────────────
 async function timeoutStaleRun(userId) {
     const stale = await Run.findOne({ user: userId, status: 'running' });
-    if (stale && Date.now() - new Date(stale.startedAt).getTime() > RUN_TIMEOUT_MS) {
-        stale.status = 'error';
-        stale.errorMessage = 'Run timed out (exceeded 10 minutes).';
-        stale.finishedAt = new Date();
-        await stale.save();
-        return true;
+    if (stale) {
+        const ageMs = Date.now() - new Date(stale.startedAt).getTime();
+        console.log(`[timeout] Found running run ${stale._id}, age: ${(ageMs / 1000).toFixed(0)}s`);
+        if (ageMs > RUN_TIMEOUT_MS) {
+            stale.status = 'error';
+            stale.errorMessage = 'Run timed out (exceeded 10 minutes).';
+            stale.finishedAt = new Date();
+            await stale.save();
+            console.log(`[timeout] Marked run ${stale._id} as timed out.`);
+            return true;
+        }
     }
     return false;
 }
+
+// ── POST /api/v1/reset-run  (force-clear stuck 'running' runs) ───────────────
+app.post('/api/v1/reset-run', verifyJWT, async (req, res) => {
+    try {
+        const result = await Run.updateMany(
+            { user: req.user._id, status: 'running' },
+            { $set: { status: 'error', errorMessage: 'Manually reset by user.', finishedAt: new Date() } }
+        );
+        console.log(`[reset-run] Force-cleared ${result.modifiedCount} running run(s) for user ${req.user._id}`);
+        res.json({ message: `Cleared ${result.modifiedCount} stuck run(s).` });
+    } catch (err) {
+        console.error('[reset-run] Error:', err.message);
+        res.status(500).json({ message: 'Failed to reset runs.' });
+    }
+});
 
 // ── GET /api/v1/dashboard  (per-user stats from last completed run) ──────────
 app.get('/api/v1/dashboard', verifyJWT, async (req, res) => {
