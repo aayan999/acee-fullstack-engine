@@ -230,9 +230,10 @@ app.post('/api/v1/evolve', verifyJWT, async (req, res) => {
                 console.log(`[engine] ${line}`)
             );
         });
+        // Forward engine stderr to server logs (many tools like git send info to stderr — not always errors)
         child.stderr.on('data', (data) => {
             String(data).split('\n').filter(Boolean).forEach(line =>
-                console.error(`[engine:err] ${line}`)
+                console.log(`[engine] ${line}`)
             );
         });
         child.on('error', (err) => {

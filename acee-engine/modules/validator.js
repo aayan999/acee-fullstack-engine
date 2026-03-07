@@ -17,7 +17,7 @@ export class Validator {
                 execSync('docker info', { stdio: 'pipe' });
                 console.log('🐳 Validator: Docker daemon detected — using containerised validation.');
             } catch {
-                console.warn('⚠️  Validator: VALIDATE_WITH_DOCKER=true but Docker daemon is not running. Falling back to local node --check.');
+                console.log('⚠️  Validator: VALIDATE_WITH_DOCKER=true but Docker daemon is not running. Falling back to local node --check.');
                 this.useDocker = false;
             }
         } else {
