@@ -124,6 +124,8 @@ app.get('/api/v1/dashboard', verifyJWT, async (req, res) => {
                 totalCharsSaved: s.totalCharsSaved,
                 completionTime: lastRun.finishedAt ? lastRun.finishedAt.toLocaleString() : null,
                 repoUrl: lastRun.repoUrl,
+                runId: lastRun._id,
+                evolvedFilesCount: lastRun.evolvedFiles ? lastRun.evolvedFiles.length : 0,
             }
         });
     } catch (err) {
@@ -151,6 +153,27 @@ app.get('/api/v1/status', verifyJWT, async (req, res) => {
     } catch (err) {
         console.error('[status] Error:', err.message);
         res.status(500).json({ message: 'Failed to fetch status.' });
+    }
+});
+
+// ── GET /api/v1/runs/:runId/files  (evolved files for a run) ─────────────────
+app.get('/api/v1/runs/:runId/files', verifyJWT, async (req, res) => {
+    try {
+        const run = await Run.findOne({ _id: req.params.runId, user: req.user._id });
+        if (!run) {
+            return res.status(404).json({ message: 'Run not found.' });
+        }
+        return res.json({
+            data: {
+                runId: run._id,
+                repoUrl: run.repoUrl,
+                status: run.status,
+                evolvedFiles: run.evolvedFiles || [],
+            }
+        });
+    } catch (err) {
+        console.error('[runs/files] Error:', err.message);
+        res.status(500).json({ message: 'Failed to fetch evolved files.' });
     }
 });
 

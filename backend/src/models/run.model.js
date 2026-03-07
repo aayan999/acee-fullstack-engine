@@ -23,6 +23,13 @@ const runSchema = new Schema({
         totalCharsSaved: { type: Number, default: 0 },
     },
     errorMessage: { type: String, default: null },
+    evolvedFiles: [{
+        filePath: { type: String },
+        originalSize: { type: Number },
+        evolvedSize: { type: Number },
+        charDiff: { type: Number },
+        evolvedContent: { type: String },
+    }],
     startedAt: { type: Date, default: Date.now },
     finishedAt: { type: Date, default: null },
 }, { timestamps: true });

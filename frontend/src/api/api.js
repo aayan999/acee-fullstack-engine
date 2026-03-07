@@ -77,4 +77,5 @@ export const api = {
     getStatus: () => request('/status', { method: 'GET' }),
     evolve: (repoUrl) => request('/evolve', { method: 'POST', body: JSON.stringify({ repoUrl }) }),
     resetRun: () => request('/reset-run', { method: 'POST' }),
+    getEvolvedFiles: (runId) => request(`/runs/${runId}/files`, { method: 'GET' }),
 };

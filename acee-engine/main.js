@@ -189,11 +189,19 @@ async function processFile(targetFile, ingestor, analyzer, evolver, validator) {
             .catch(e => console.error('Audit log write error:', e.message));
 
         validator.revert(targetFile);
+        return null;
     } else {
         projectAudit.successfulFixes++;
         const charsRemoved = originalFileLength - currentFileContent.length;
         projectAudit.totalCharsSaved += charsRemoved;
         console.log(`   ✅ ${targetFile} successfully evolved. (${charsRemoved > 0 ? charsRemoved + ' chars removed' : Math.abs(charsRemoved) + ' chars added'})`);
+        return {
+            filePath: targetFile,
+            originalSize: originalFileLength,
+            evolvedSize: currentFileContent.length,
+            charDiff: charsRemoved,
+            evolvedContent: currentFileContent,
+        };
     }
 }
 
@@ -246,6 +254,10 @@ async function startEvolution() {
 
         console.log(`🚀 ACEE: Starting Mass Evolution on ${availableFiles.length} files (concurrency: ${FILE_CONCURRENCY})...`);
 
+        // Collect evolved file data for MongoDB persistence
+        const evolvedFiles = [];
+        const MAX_EVOLVED_FILES = 50; // Cap to stay under MongoDB 16MB doc limit
+
         // 2. ⚡ Batch-process files with configurable concurrency
         for (let i = 0; i < availableFiles.length; i += FILE_CONCURRENCY) {
             const batch = availableFiles.slice(i, i + FILE_CONCURRENCY);
@@ -255,10 +267,12 @@ async function startEvolution() {
                 batch.map(file => processFile(file, ingestor, analyzer, evolver, validator))
             );
 
-            // Log any unexpected rejections
+            // Collect successful evolutions & log rejections
             for (const r of results) {
                 if (r.status === 'rejected') {
                     console.error(`   ❌ Batch error: ${r.reason?.message || r.reason}`);
+                } else if (r.value && evolvedFiles.length < MAX_EVOLVED_FILES) {
+                    evolvedFiles.push(r.value);
                 }
             }
         }
@@ -304,7 +318,7 @@ async function startEvolution() {
             finishedAt: new Date().toISOString()
         });
 
-        // ✅ Update MongoDB (per-user run record)
+        // ✅ Update MongoDB (per-user run record) — includes evolved file contents
         await updateRunInDB(runId, {
             status: 'done',
             finishedAt: new Date(),
@@ -314,6 +328,7 @@ async function startEvolution() {
                 syntaxErrorsPrevented: projectAudit.syntaxErrorsPrevented,
                 totalCharsSaved: projectAudit.totalCharsSaved,
             },
+            evolvedFiles,
         });
 
     } catch (error) {

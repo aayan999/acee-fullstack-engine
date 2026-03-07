@@ -12,7 +12,7 @@ const STATS = [
     { key: 'successRate', label: 'Success Rate', icon: '📈', color: '#6c63ff', maxRef: 100 },
 ];
 
-const EMPTY = { totalScanned: 0, successfulFixes: 0, syntaxErrorsPrevented: 0, totalCharsSaved: 0, successRate: '0.00', completionTime: null, repoUrl: null };
+const EMPTY = { totalScanned: 0, successfulFixes: 0, syntaxErrorsPrevented: 0, totalCharsSaved: 0, successRate: '0.00', completionTime: null, repoUrl: null, runId: null, evolvedFilesCount: 0 };
 
 /* ─── Animated counter ────────────────────────────────── */
 function AnimatedNumber({ value }) {
@@ -148,16 +148,30 @@ export default function DashboardPage() {
     const [runError, setRunError] = useState('');
     const [loading, setLoading] = useState(true);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [evolvedFiles, setEvolvedFiles] = useState([]);
+    const [expandedFile, setExpandedFile] = useState(null);
+    const [loadingFiles, setLoadingFiles] = useState(false);
     const pollRef = useRef(null);
+
+    const fetchEvolvedFiles = useCallback(async (runId) => {
+        if (!runId) return;
+        setLoadingFiles(true);
+        try {
+            const { data } = await api.getEvolvedFiles(runId);
+            setEvolvedFiles(data.evolvedFiles || []);
+        } catch (_) { setEvolvedFiles([]); }
+        finally { setLoadingFiles(false); }
+    }, []);
 
     const fetchStats = useCallback(async () => {
         try {
             const { data } = await api.dashboard();
             const t = data.totalScanned || 0, f = data.successfulFixes || 0;
             setStats({ ...EMPTY, ...data, successRate: t > 0 ? ((f / t) * 100).toFixed(2) : '0.00' });
+            if (data.runId) fetchEvolvedFiles(data.runId);
         } catch (_) { }
         finally { setLoading(false); }
-    }, []);
+    }, [fetchEvolvedFiles]);
 
     const fetchStatus = useCallback(async () => {
         try {
@@ -373,6 +387,63 @@ export default function DashboardPage() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* ─── Evolved Files section ─────────────────── */}
+                        {evolvedFiles.length > 0 && (
+                            <div style={{ marginBottom: 32, animation: 'fadeUp 0.5s var(--ease) 0.4s both' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                                    <div>
+                                        <h2 style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 4 }}>Evolved Files</h2>
+                                        <p style={{ color: 'var(--text-3)', fontSize: '0.8rem', margin: 0 }}>{evolvedFiles.length} file{evolvedFiles.length !== 1 ? 's' : ''} successfully evolved</p>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    {evolvedFiles.map((f, i) => {
+                                        const isExpanded = expandedFile === i;
+                                        const diffSign = f.charDiff > 0 ? '-' : '+';
+                                        const diffColor = f.charDiff > 0 ? '#4ade80' : '#fbbf24';
+                                        const diffLabel = f.charDiff > 0 ? `${f.charDiff} chars reduced` : `${Math.abs(f.charDiff)} chars added`;
+                                        return (
+                                            <div key={i} className="glass" style={{ borderRadius: 'var(--r-md)', overflow: 'hidden', borderColor: isExpanded ? 'rgba(108,99,255,0.25)' : undefined }}>
+                                                <div
+                                                    onClick={() => setExpandedFile(isExpanded ? null : i)}
+                                                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', cursor: 'pointer', transition: 'background 0.15s' }}
+                                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                                                    onMouseLeave={e => e.currentTarget.style.background = ''}
+                                                >
+                                                    <span style={{ fontSize: '1rem' }}>📄</span>
+                                                    <span style={{ flex: 1, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-1)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                                                        {f.filePath}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: diffColor, background: `${diffColor}15`, borderRadius: 99, padding: '3px 10px', whiteSpace: 'nowrap' }}>
+                                                        {diffSign}{Math.abs(f.charDiff)} chars
+                                                    </span>
+                                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
+                                                        {f.originalSize} → {f.evolvedSize}
+                                                    </span>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                                        style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', flexShrink: 0 }}>
+                                                        <polyline points="6 9 12 15 18 9" />
+                                                    </svg>
+                                                </div>
+                                                {isExpanded && f.evolvedContent && (
+                                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '0 4px 4px' }}>
+                                                        <pre style={{
+                                                            margin: 0, padding: '16px 18px', fontSize: '0.78rem', lineHeight: 1.65,
+                                                            color: '#c9d1d9', background: 'rgba(0,0,0,0.35)', borderRadius: '0 0 var(--r-md) var(--r-md)',
+                                                            overflow: 'auto', maxHeight: 400, fontFamily: '"Fira Code", "Cascadia Code", monospace',
+                                                            whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                                                        }}>
+                                                            {f.evolvedContent}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* No data empty state */}
                         {stats.totalScanned === 0 && (
