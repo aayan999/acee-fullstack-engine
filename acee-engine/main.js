@@ -13,8 +13,8 @@ const __dirname = path.dirname(__filename);
 const STATUS_FILE = path.join(__dirname, 'run_status.json');
 const DASHBOARD_FILE = path.join(__dirname, 'dashboard_data.json');
 
-// ⚡ Configurable concurrency — process this many files in parallel
-const FILE_CONCURRENCY = parseInt(process.env.ACEE_FILE_CONCURRENCY, 10) || 3;
+// ⚡ Configurable concurrency — reduced to 2 for smoother demo on free tier
+const FILE_CONCURRENCY = parseInt(process.env.ACEE_FILE_CONCURRENCY, 10) || 2;
 
 const writeStatus = (status, repoUrl, extra = {}) => {
     try {
@@ -70,6 +70,13 @@ const projectAudit = {
  * Extracted from the main loop so files can be processed concurrently.
  */
 async function processFile(targetFile, ingestor, analyzer, evolver, validator) {
+    // 🚧 Skip minified/vendor files — they waste API calls and burn rate limits
+    const basename = path.basename(targetFile);
+    if (basename.endsWith('.min.js') || basename.endsWith('.bundle.js') || basename.endsWith('.bundle.min.js')) {
+        console.log(`\n⏭️  Skipping ${targetFile}: Minified/bundled file (not worth evolving).`);
+        return null;
+    }
+
     const fullPath = path.join(ingestor.workspacePath, targetFile);
     console.log(`\n📂 Processing: ${targetFile}`);
     projectAudit.totalScanned++;
@@ -77,7 +84,7 @@ async function processFile(targetFile, ingestor, analyzer, evolver, validator) {
     const functions = analyzer.analyzeFile(fullPath);
     if (!functions || functions.length === 0) {
         console.log(`   ⏭️ No functions found, skipping.`);
-        return;
+        return null;
     }
 
     let currentFileContent = fs.readFileSync(fullPath, 'utf8');
@@ -358,4 +365,7 @@ async function startEvolution() {
     }
 }
 
-startEvolution();
+startEvolution().catch(err => {
+    console.error('💥 Fatal engine error:', err.message);
+    process.exit(1);
+});

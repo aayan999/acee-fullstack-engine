@@ -4,6 +4,8 @@ import fsp from "fs/promises";
 import path from "path";
 
 export class Ingestor {
+    // Directories to skip — vendor, build, and test folders
+    static SKIP_DIRS = new Set(['node_modules', '.git', 'vendor', 'dist', 'build', 'lib', '__tests__', '__mocks__', 'coverage']);
     constructor(workspacePath) {
         this.workspacePath = workspacePath;
     }
@@ -53,7 +55,7 @@ export class Ingestor {
             const filePath = path.join(dir, entry.name);
 
             if (entry.isDirectory()) {
-                if (entry.name !== 'node_modules' && entry.name !== '.git') {
+                if (!Ingestor.SKIP_DIRS.has(entry.name)) {
                     const subResults = await this.getFilesByLanguageAsync(lang, filePath);
                     return subResults;
                 }
@@ -91,7 +93,7 @@ export class Ingestor {
             const stat = fs.statSync(filePath);
 
             if (stat && stat.isDirectory()) {
-                if (file !== 'node_modules' && file !== '.git') {
+                if (!Ingestor.SKIP_DIRS.has(file)) {
                     results = results.concat(this.getFilesByLanguage(lang, filePath));
                 }
             } else if (file.endsWith(ext)) {

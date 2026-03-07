@@ -50,8 +50,9 @@ export class CodeEvolver {
         // Identical function bodies skip the API call entirely
         this._cache = new Map();
 
-        // 🚦 Concurrency limiter — prevents API overload
-        this._limiter = new ConcurrencyLimiter(2);
+        // 🚦 Concurrency limiter — reduced to 1 to stay UNDER Free-Tier rate limits (demo mode)
+        this._limiter = new ConcurrencyLimiter(1);
+        this.baseWaitTime = 15000; // 15s wait for rate limit retries
 
         // 📊 Cache metrics
         this.cacheHits = 0;
@@ -118,6 +119,11 @@ export class CodeEvolver {
 
             // 🧠 Cache the successful evolution
             this._cache.set(bodyHash, sanitizedCode);
+
+            // 🚦 Short sleep after success to prevent hitting the RPM limit (30 requests/min)
+            // This spaces out requests naturally for a smoother demo.
+            await new Promise(r => setTimeout(r, 2000));
+
             return sanitizedCode;
 
         } catch (error) {
