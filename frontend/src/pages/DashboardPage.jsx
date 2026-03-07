@@ -148,6 +148,7 @@ export default function DashboardPage() {
     const [runError, setRunError] = useState('');
     const [loading, setLoading] = useState(true);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [evolvedFiles, setEvolvedFiles] = useState([]);
     const [expandedFile, setExpandedFile] = useState(null);
     const [loadingFiles, setLoadingFiles] = useState(false);
@@ -164,13 +165,17 @@ export default function DashboardPage() {
     }, []);
 
     const fetchStats = useCallback(async () => {
+        setRefreshing(true);
         try {
             const { data } = await api.dashboard();
             const t = data.totalScanned || 0, f = data.successfulFixes || 0;
+            // Briefly reset to zero so AnimatedNumber re-animates on refresh
+            setStats(EMPTY);
+            await new Promise(r => setTimeout(r, 50));
             setStats({ ...EMPTY, ...data, successRate: t > 0 ? ((f / t) * 100).toFixed(2) : '0.00' });
             if (data.runId) fetchEvolvedFiles(data.runId);
         } catch (_) { }
-        finally { setLoading(false); }
+        finally { setLoading(false); setRefreshing(false); }
     }, [fetchEvolvedFiles]);
 
     const fetchStatus = useCallback(async () => {
@@ -317,8 +322,8 @@ export default function DashboardPage() {
                             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 4 }}>Audit Statistics</h2>
                             <p style={{ color: 'var(--text-3)', fontSize: '0.8rem', margin: 0 }}>Your personal evolution metrics</p>
                         </div>
-                        <button className="btn btn-ghost" onClick={fetchStats} id="refresh-btn" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
-                            ↻ Refresh
+                        <button className="btn btn-ghost" onClick={fetchStats} disabled={refreshing} id="refresh-btn" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
+                            {refreshing ? <><div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> Refreshing…</> : '↻ Refresh'}
                         </button>
                     </div>
                 </div>

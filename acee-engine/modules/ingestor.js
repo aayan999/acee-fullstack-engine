@@ -22,11 +22,13 @@ export class Ingestor {
     async cloneRepo(repoUrl) {
         try {
             console.log(`Cloning repo ${repoUrl}`);
-            execSync(`git clone ${repoUrl} ${this.workspacePath}`, { stdio: "inherit" });
+            // Use 'pipe' to capture git's stderr progress messages
+            // (git sends progress info to stderr by default, which is normal — not an error)
+            execSync(`git clone ${repoUrl} ${this.workspacePath}`, { stdio: 'pipe' });
             console.log(`Repo ${repoUrl} cloned successfully`);
             return true;
         } catch (error) {
-            console.error(`Error cloning repo ${repoUrl}: ${error}`);
+            console.error(`Error cloning repo ${repoUrl}: ${error.stderr?.toString() || error.message}`);
             return false;
         }
     }
